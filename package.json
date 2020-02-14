@@ -1,0 +1,15 @@
+{
+  "name": "ecom",
+  "version": "1.0.0",
+  "description": "",
+  "author": "perezvon",
+  "license": "ISC",
+  "scripts": {
+    "start": "cd server && node server",
+    "dev": "concurrently \"cd ./server && node --inspect server\" \"cd ./client && react-scripts start\"",
+    "heroku-postbuild": "cd ./server && yarn && cd ../client && yarn && yarn run build"
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0"
+  }
+}

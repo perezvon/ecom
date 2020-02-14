@@ -1,0 +1,14 @@
+head
+  link(rel='stylesheet', href='email-templates.css', data-inline)
+  link(href="https://fonts.googleapis.com/css?family=Open+Sans", rel="stylesheet", data-inline)
+.container
+  .img-container(style='width:100%; text-align:center;')
+    img(src='https://aspenmills.com/logo.png' width='300px')
+  h1 New order!
+  
+  table 
+    tbody
+      #{orderTableHeaders}
+      #{orderDetails}
+
+  a(href=`https://aspenmills.com`) Go to store
