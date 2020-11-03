@@ -36,7 +36,7 @@ const ShopLayout = ({ children }) => {
       <SiteHeader siteTitle={store.name} url={store.url} />
       <Container>
         <main>{children}</main>
-        <footer>© {new Date().getFullYear()} distantbluesoftware</footer>
+        <footer>© {new Date().getFullYear()} Aspen Mills</footer>
       </Container>
     </Grommet>
   );

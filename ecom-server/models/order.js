@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
@@ -7,7 +7,7 @@ const orderSchema = new Schema({
   status: String,
   user: {
     name: String,
-    userID: Number
+    userID: String,
   },
   items: [
     {
@@ -16,28 +16,35 @@ const orderSchema = new Schema({
       name: String,
       size: String,
       qty: String,
-      price: Number
-    }
+      price: Number,
+    },
   ],
   shippingAddress: {
     address1: String,
     address2: String,
     city: String,
     state: String,
-    zip: String
+    zip: String,
   },
   billingAddress: {
     address1: String,
     address2: String,
     city: String,
     state: String,
-    zip: String
+    zip: String,
+  },
+  paymentMethod: {
+    wallet: Number,
+    cc: {
+      lastFour: Number,
+      amount: Number,
+    },
   },
   shippingMethod: String,
   billingMethod: String,
   orderDate: { type: Date, default: Date.now },
   lastModified: { type: Date, default: Date.now },
-  total: String
+  total: String,
 });
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model('Order', orderSchema);

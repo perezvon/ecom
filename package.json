@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "start": "cd server && node server",
-    "dev": "concurrently \"cd ./ecom-server && node --inspect server\" \"cd ./ecom-client && react-scripts start\"",
+    "dev": "concurrently \"cd ./ecom-server && nodemon index\" \"cd ./ecom-client && yarn start\"",
     "heroku-postbuild": "cd ./ecom-server && yarn && cd ../ecom-client && yarn && yarn run build"
   },
   "devDependencies": {

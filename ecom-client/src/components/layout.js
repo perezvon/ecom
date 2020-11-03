@@ -12,7 +12,7 @@ import SiteHeader from './header';
 // import './layout.css';
 
 const Layout = ({ children }) => {
-  const title = 'ecom'
+  const title = 'Aspen Mills'
   return (
     <Grommet theme={grommet} full={true}>
       <SiteHeader siteTitle={title} />

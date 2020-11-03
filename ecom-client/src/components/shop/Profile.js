@@ -14,7 +14,6 @@ const ProfilePage = () => {
     state: { store }
   } = useContext(SessionContext);
   const { isAuthenticated, sizing, wallet } = user;
-  console.log(user);
   return (
     <ShopLayout>
       <SEO title={`Profile - ${store.name}`} />
@@ -25,15 +24,15 @@ const ProfilePage = () => {
           </h1>
           <h3>Sizing:</h3>
           {Object.keys(sizing).map(s => (
-            <p>
-              {s}:{" "}
+            <>
+              <span>{s}:{" "}</span>
               <EditableText
-                name={`sizing::${s}`}
+                name={`${s}`}
                 value={sizing[s]}
                 type={isNaN(+sizing[s]) ? "text" : "number"}
-                onClickOutside={updateUserData}
+                onClickOutside={(val) => updateUserData(user, { sizing: {...sizing, [s]: val} })}
               />
-            </p>
+            </>
           ))}
           <h3>Wallet balance: ${formatCurrency(wallet)}</h3>
           

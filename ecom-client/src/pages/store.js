@@ -14,12 +14,17 @@ import styled from 'styled-components';
 
 import Table from '../components/framework/Table';
 import ProductTable from '../components/ProductTable';
+import ProductForm from '../components/ProductForm';
 import UserForm from '../components/UserForm';
 import SalesChart from '../components/SalesChart';
 import OrderTable from '../components/OrderTable';
 
 const UserModal = styled(Layer)`
   padding: 40px;
+`;
+
+const ProductModal = styled(Layer)`
+  padding: 20px 40px;
 `;
 
 const StoreHeader = styled.h1`
@@ -40,21 +45,22 @@ const StyledFiPlusCircle = styled(FiPlusCircle)`
   cursor: pointer;
 `;
 
-const unslugify = str => str.replace(/_/g, ' ');
+const unslugify = (str) => str.replace(/_/g, ' ');
 
 const StorePage = ({ location }) => {
   const [store, setStore] = useState({});
   const [contactEmail, setContactEmail] = useState('');
   const [allowance, setAllowance] = useState(0);
-  const [show, setShow] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showProductModal, setShowProductModal] = useState(false);
   const { state: stores, updateStore } = useContext(StoreContext);
-  const { state: inventory, addNewProduct } = useContext(ProductContext);
+  const { state: products, addNewProduct } = useContext(ProductContext);
   const { state: users, addNewUser } = useContext(UserContext);
   const { getOrdersForStore, clearState } = useContext(OrderContext);
   useEffect(() => {
     if (stores.length && window.location.search) {
       const storeFromUrl = stores.find(
-        s => s.name === unslugify(window.location.search.slice(6))
+        (s) => s.name === unslugify(window.location.search.slice(6))
       );
       if (!storeFromUrl) return;
       setStore(storeFromUrl);
@@ -66,11 +72,11 @@ const StorePage = ({ location }) => {
       return () => clearState();
     }
   }, [stores]);
-  const storeInventory = inventory.filter(
-    item => ~item.availableStores.indexOf(store.name)
+  const storeProducts = products.filter(
+    (item) => ~item.availableStores.indexOf(store.storeID)
   );
 
-  const handleEmailChange = e => {
+  const handleEmailChange = (e) => {
     setContactEmail(e.target.value);
     updateStore({
       ...store,
@@ -82,6 +88,7 @@ const StorePage = ({ location }) => {
 
   console.log(stores);
   console.log(users);
+  console.log(products);
 
   return (
     <Layout>
@@ -106,7 +113,7 @@ const StorePage = ({ location }) => {
                 icon={<FiPlusCircle />}
                 label="Add a User"
                 onClick={
-                  () => setShow(true)
+                  () => setShowUserModal(true)
                   /*addNewUser({ id, name: 'jorg Borgson', stores: [store.id] })*/
                 }
               />
@@ -129,10 +136,25 @@ const StorePage = ({ location }) => {
                   <Table
                     headers={['name', 'email', 'rank']}
                     data={users
-                      .filter(u => ~u.stores.indexOf(store.storeID))
+                      .filter((u) => ~u.stores.indexOf(store.storeID))
                       .map(({ name, email, rank }) => ({ name, email, rank }))}
                   />
                 </>
+              )}
+            </Box>
+          </Tab>
+          <Tab title="Products">
+            <Box pad="medium">
+              <FlexContainer>
+                <h2>Store Inventory</h2>
+                <StyledFiPlusCircle
+                  className="icon"
+                  size={32}
+                  onClick={() => setShowProductModal(true)}
+                />
+              </FlexContainer>
+              {storeProducts.length > 0 && (
+                <ProductTable products={storeProducts} currentStore={store} />
               )}
             </Box>
           </Tab>
@@ -141,8 +163,12 @@ const StorePage = ({ location }) => {
               <CheckBox
                 checked={store.hasManagerPortal}
                 label="Has QM"
-                onChange={e =>
-                  updateStore({ ...store, hasManagerPortal: e.target.checked })
+                onChange={(e) =>
+                  updateStore({
+                    ...store,
+                    hasManagerPortal: e.target.checked,
+                    managerPortal: {},
+                  })
                 }
               />
               {store.hasManagerPortal && (
@@ -152,7 +178,7 @@ const StorePage = ({ location }) => {
                       store.managerPortal && store.managerPortal.approval
                     }
                     label="Needs Approval"
-                    onChange={e =>
+                    onChange={(e) =>
                       updateStore({
                         ...store,
                         managerPortal: {
@@ -174,7 +200,7 @@ const StorePage = ({ location }) => {
               <CheckBox
                 checked={store.hasAllowance}
                 label="Has Allowance"
-                onChange={e =>
+                onChange={(e) =>
                   updateStore({ ...store, hasAllowance: e.target.checked })
                 }
               />
@@ -184,7 +210,7 @@ const StorePage = ({ location }) => {
                   name="amount"
                   type="number"
                   value={allowance}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateStore({
                       ...store,
                       allowance: e.target.value,
@@ -196,37 +222,41 @@ const StorePage = ({ location }) => {
           </Tab>
         </Tabs>
 
-        <a href={store.url}>Go to storefront</a>
+        <a href={store.url} target="_blank">
+          Go to storefront
+        </a>
       </div>
 
-      {storeInventory.length > 0 && (
-        <>
-          <FlexContainer>
-            <h2>Store Inventory</h2>
-            <StyledFiPlusCircle
-              className="icon"
-              size={32}
-              onClick={() => console.log('hi')}
-            />
-          </FlexContainer>
-          <ProductTable inventory={storeInventory} currentStore={store} />
-        </>
-      )}
       <Link to="/">Go back to the homepage</Link>
-      {show && (
+      {showUserModal && (
         <UserModal
-          onEsc={() => setShow(false)}
-          onClickOutside={() => setShow(false)}
+          onEsc={() => setShowUserModal(false)}
+          onClickOutside={() => setShowUserModal(false)}
         >
           <h3>Add New User</h3>
           <UserForm
-            onSubmit={data => {
+            onSubmit={(data) => {
               addNewUser(data);
-              setShow(false);
+              setShowUserModal(false);
             }}
             currentStore={store}
           />
         </UserModal>
+      )}
+      {showProductModal && (
+        <ProductModal
+          onEsc={() => setShowProductModal(false)}
+          onClickOutside={() => setShowProductModal(false)}
+        >
+          <h3>Add New Product</h3>
+          <ProductForm
+            onSubmit={(data) => {
+              addNewProduct(data);
+              setShowProductModal(false);
+            }}
+            currentStore={store}
+          />
+        </ProductModal>
       )}
     </Layout>
   );

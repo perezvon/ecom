@@ -54,7 +54,7 @@ const OrderTable = ({ store }) => {
                   {moment(o.orderDate).format("MM/DD/YYYY")}
                 </TableCell>
                 <TableCell>{o.user && (o.user.name || o.user.email)}</TableCell>
-                <TableCell>{o.total}</TableCell>
+                <TableCell>${o.total}</TableCell>
               </ClickableRow>
             ))}
         </TableBody>

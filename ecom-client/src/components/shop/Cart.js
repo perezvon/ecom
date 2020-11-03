@@ -69,12 +69,13 @@ const CartPage = ({ data }) => {
     return p.images[0] ? `${s3bucket}/${folder}/${p.images[0]}` : null;
   }
 
-  const total = cart.reduce((a, c) => c.price * c.qty + a, 0).toFixed(2);
+  const total = cart.reduce((a, c) => (c.price || 0) * c.qty + a, 0).toFixed(2);
 
   const doCheckout = () => {
     if (isAuthenticated) {
       setLoading(true);
       setTimeout(() => {
+        const paymentMethod = wallet && wallet >= total ? { wallet: total } : {wallet, cc: { lastFour: 1234, amount: total - wallet }}
         const items = cart.map(c => {
           const { itemID, name, size, qty, price } = c;
           return { itemID, name, size, qty, price };
@@ -85,6 +86,7 @@ const CartPage = ({ data }) => {
           status: "open",
           shippingMethod,
           billingMethod,
+          paymentMethod,
           items,
           user: {
             name: `${firstName} ${lastName}`,

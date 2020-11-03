@@ -30,15 +30,11 @@ const AppRouter = () => {
           <Route path="/shop">
             <ShopRouter />
           </Route>
-          <Route exact path="/">
-            {isAuthenticated && role === 1 ? (
-              <StateLoader type="admin">
-                <AdminHome />
-              </StateLoader>
-            ) : (
-              <MainLandingPage />
-            )}
-          </Route>
+          <PrivateRoute exact path="/">
+            <StateLoader type="admin">
+              <AdminHome />
+            </StateLoader>
+          </PrivateRoute>
           <PrivateRoute path="/store">
             <StorePage />
           </PrivateRoute>

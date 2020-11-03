@@ -10,9 +10,10 @@ import { Button, Select, CheckBox, TextInput } from 'grommet';
 import { FiTag } from 'react-icons/fi';
 import SEO from '../seo';
 import { s3bucket, folder } from '../../config';
+import formatCurrency from '../../lib/formatCurrency';
 
 const ProductMain = styled.div`
-  height: 50vh;
+  min-height: 50vh;
   display: flex;
 `;
 
@@ -60,13 +61,13 @@ const ProductPage = ({ data }) => {
       if (product) {
         setProductInfo(product);
         if (product.inventory) setSize(Object.keys(product.inventory)[0]);
-        if (user.isAuthenticated && user.size) {
-          setSizingInfo(<p>{user.size.shirt}</p>);
-          if (useSizeOnFile) setSize(user.size.shirt);
+        if (user.isAuthenticated && user.sizing) {
+          setSizingInfo(<p>{user.sizing.shirt}</p>);
+          if (useSizeOnFile) setSize(user.sizing.shirt);
         }
       }
     }
-  }, [store, useSizeOnFile, user.isAuthenticated, user.size]);
+  }, [store, useSizeOnFile, user.isAuthenticated, user.sizing]);
 
   const handleSizeOptionChange = val => {
     setUseSizeOnFile(val, () => val && setSize(user.size.shirt));
@@ -92,14 +93,20 @@ const ProductPage = ({ data }) => {
           <div>
             <h3>{productInfo.name}</h3>
             <PreWrappedText>{productInfo.description}</PreWrappedText>
-            <span>${productInfo.price}</span>
+            <span>${formatCurrency(productInfo.price)}</span>
           </div>
-          <CheckBox
-            checked={useSizeOnFile}
-            label="Use size on file"
-            onChange={e => handleSizeOptionChange(e.target.checked)}
-          />
-          {useSizeOnFile && <UserSizeContainer>{sizingInfo}</UserSizeContainer>}
+          {productInfo.inventory && (
+            <>
+              <CheckBox
+                checked={useSizeOnFile}
+                label="Use size on file"
+                onChange={e => handleSizeOptionChange(e.target.checked)}
+              />
+              {useSizeOnFile && (
+                <UserSizeContainer>{sizingInfo}</UserSizeContainer>
+              )}
+            </>
+          )}
 
           <ProductOptions>
             {!useSizeOnFile && (

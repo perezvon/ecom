@@ -31,9 +31,11 @@ router.get("/user", requireAuth, (req, res) => {
     });
 });
 
-router.put('/user/:id', requireAuth, async (req, res) => {
-  console.log(req.body)
-  // const user = await User.findOne({})
+router.put('/user', requireAuth, async (req, res) => {
+  const user = await User.findOneAndUpdate({userID: req.params.id}, req.body)
+  console.log(user)
+  
+  res.json(user)
 });
 
 router.post('/user/new', requireAuth, async (req, res) => {
@@ -113,6 +115,7 @@ router.post("/orders/new", requireAuth, async (req, res) => {
   const store = await Store.findOne({ storeID: req.body.storeID }).exec();
   const orders = await Order.find().exec();
   const order = new Order({ ...req.body, orderID: orders.length + 1021 });
+  order.user.userID = req.params.id;
   if (store.managerPortal && store.managerPortal.approval) {
     order.status = "pending";
     await order.save();
@@ -140,13 +143,19 @@ router.post("/orders/new", requireAuth, async (req, res) => {
     res.send(order);
   } else {
     await order.save();
-    stripe.createCharge({
-      amount: +order.total * 100,
+    const remainingTotal = order.paymentMethod.wallet ? order.total - order.paymentMethod.wallet : order.total;
+    if (order.paymentMethod.wallet) {
+      // deduct wallet balance from user wallet
+      const user = await User.findOne({ userID: req.params.id });
+      user.wallet = user.wallet - order.paymentMethod.wallet;
+      await user.save();
+    }
+    if (remainingTotal) stripe.createCharge({
+      amount: remainingTotal * 100,
       currency: "usd",
       source: "tok_visa",
       receipt_email: "hi@hey.com"
     });
-    console.log(store);
     emailService
       .send({
         template: "new_order",

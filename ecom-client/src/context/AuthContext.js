@@ -1,6 +1,6 @@
 import createDataContext from "./createDataContext";
 import axios from "axios";
-import { serverURL } from '../api';
+import { serverURL, sessionAuth } from '../api';
 
 const authReducer = (state, action) => {
   switch (action.type) {
@@ -24,7 +24,6 @@ const authReducer = (state, action) => {
 
 const doRegister = dispatch => {
   return async (userData) => {
-    console.log('userData', userData)
     const response = await axios.post("http://localhost:3001/auth/register", userData);
     dispatch({ type: "register", payload: response.data });
   };
@@ -51,7 +50,7 @@ const rehydrateAuth = dispatch => {
     const token = localStorage.getItem("sessionAuth");
     if (token) {
     const response = await axios.post(`${serverURL}/auth/restoreSession`, {}, { headers: {'Authorization': token}});
-    dispatch({ type: "login", payload: { ...response.data, isAuthenticated: true } });
+    dispatch({ type: "login", payload: { ...response.data, isAuthenticated: true, fromSession: true } });
   }
     else dispatch({ type: "login", payload: { isAuthenticated: false } });
   };
@@ -59,16 +58,11 @@ const rehydrateAuth = dispatch => {
 
 const updateUserData = dispatch => {
   return async (user, data) => {
-    const parsedData = {};
-    const splitName = data.name.split("::");
-    const isSubObject = splitName.length > 1;
-    let subvalue;
-    if (isSubObject) {
-      subvalue = splitName[0];
-      parsedData[splitName[0]] = { [splitName[1]]: data.value };
-    }
-    const response = await axios.put(`${serverURL}/user/${user.userID}`);
-    dispatch({ type: "update_data", subvalue, payload: parsedData });
+    let subvalue = Object.keys(data)[0];
+    const response = await axios.put(`${serverURL}/user`, data, {
+      headers: sessionAuth()
+    });
+    dispatch({ type: "update_data", subvalue, payload: data });
   };
 };
 

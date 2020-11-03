@@ -18,6 +18,7 @@ const FormBuilder = ({ fieldsList, button, formState, onSubmit }) => {
           name={f.name}
           label={f.label}
           type={f.type || 'text'}
+          step={f.type === 'number' && f.step}
           onChange={e => setValue(f.name, e.target.value)}
         />
       ))}

@@ -63,7 +63,7 @@ const ShopHome = () => {
               <ProductImage src={getProductImage(p) || "https://picsum.photos/200/300"} />
               <CardDescription>
                 <span>{p.name}</span>
-                <CardPrice>${p.price.toFixed(2)}</CardPrice>
+                <CardPrice>${(p.price || 0).toFixed(2)}</CardPrice>
               </CardDescription>
             </ItemCard>
           ))}
