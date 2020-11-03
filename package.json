@@ -4,6 +4,10 @@
   "description": "",
   "author": "perezvon",
   "license": "ISC",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
   "scripts": {
     "start": "cd server && node server",
     "dev": "concurrently \"cd ./ecom-server && nodemon index\" \"cd ./ecom-client && yarn start\"",
